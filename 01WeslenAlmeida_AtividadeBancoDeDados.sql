@@ -1,6 +1,5 @@
--- DDL -----------------------------------------------------------------------------------
+--================================================================================================= DDL
 --Data Definition Language - Linguagem de Definição de Dados
-
 
 /* EXERCICIOS
 
@@ -86,20 +85,13 @@ CREATE TABLE historicos(
 						REFERENCES professores (idProfessor),
 	CONSTRAINT		fk_idDisc_hist FOREIGN KEY (idDisc_hist)
 						REFERENCES disciplinas (idDisciplina)
-)
+) 
+--================================================================================================= DDL
 
---deleta a coluna cargaHoraria da tablea de historicos
-ALTER TABLE historicos DROP COLUMN cargaHoraria
 
---ADICIONA A PORRA DA COLUNA cargaHoraria, não precisa column nessa merda
-ALTER TABLE disciplinas ADD cargaHoraria FLOAT
 
-ALTER TABLE historicos 
--- DDL -----------------------------------------------------------------------------------
 
---=================================================================================================
-
--- DML -----------------------------------------------------------------------------------
+--================================================================================================= DML
 --Data Manipulation Language - Linguagem de Manipulação de Dados
 
 
@@ -108,18 +100,21 @@ Rede de Computadores e Estrutura de dados, 3 professores e 15 históricos)*/
 
 --insere dados
 INSERT INTO alunos (nome, idCidade_aluno) VALUES
-('Joa da silva', 5053),
-('Maria da silva', 1),
-('Pedro Pereira', 2),
-('Amelia Reis', 25),
-('Ana Aparecida', 101);
+('Joa da silva',	5053),
+('Maria da silva',	1),
+('Pedro Pereira',	2),
+('Amelia Reis',		25),
+('Ana Aparecida',	101);
 
 INSERT INTO alunos (nome, idCidade_aluno) VALUES
-('Arthur Barbosa', 33),
-('Carlos filho', 66),
-('Fernando Moreira', 99),
-('Julio Santos', 115),
-('Luana Batista', 199);
+('Arthur Barbosa',	33),
+('Carlos filho',	66),
+('Fernando Moreira',99),
+('Julio Santos',	115),
+('Luana Batista',	199),
+('Alexandro C',		5053),
+('Jose Pedrosa',	999),
+('Jose Pedrosa',	999);
 
 INSERT INTO disciplinas (disciplina, cargaHoraria) VALUES
 ('Banco de Dados',100.00),
@@ -132,34 +127,37 @@ INSERT INTO professores (nome, idCidade_prof) VALUES
 ('Nava',5052),
 ('Rita',200);
 
-INSERT INTO historicos(semestre, falta, nota, idRA_hist, idProf_hist, idDisc_hist) VALUES
+INSERT INTO historicos(semestre, falta, nota, idRA_hist, idProf_hist, idDisc_hist, ano) VALUES
 --semestre 1
-(1, 2, 8.0, 1, 1, 1),
-(1, 4, 5.0, 2, 1, 1),
-(1, 2, 6.0, 3, 1, 1),
-(1, 4, 7.0, 4, 1, 1),
-(1, 8, 4.0, 5, 1, 1),
-(1, 0, 9.0, 1, 2, 4),
-(1, 2, 6.0, 2, 2, 4),
-(1, 4, 5.0, 3, 2, 4),
-(1, 4, 8.0, 4, 2, 4),
-(1, 4, 3.1, 5, 2, 4),
-(2, 2, 8.0, 6, 3, 3),
-(2, 0, 8.0, 7, 3, 3),
-(2, 2, 5.0, 8, 3, 3),
-(2, 4, 6.0, 9, 3, 3),
-(2, 4, 7.0, 10, 3, 3),
-(2, 2, 7.2, 6, 1, 2),
-(2, 0, 6.1, 7, 1, 2),
-(2, 6, 5.9, 8, 1, 2),
-(2, 2, 7.8, 9, 1, 2),
-(2, 4, 6.3, 10, 1, 2);
+(1, 2, 8.0, 1, 1, 1, 2017),
+(1, 4, 5.0, 2, 1, 1, 2017),
+(1, 2, 6.0, 3, 1, 1, 2017),
+(1, 4, 7.0, 4, 1, 1, 2017),
+(1, 8, 4.0, 5, 1, 1, 2017),
+(1, 0, 9.0, 1, 2, 4, 2017),
+(1, 2, 6.0, 2, 2, 4, 2017),
+(1, 4, 5.0, 3, 2, 4, 2017),
+(1, 4, 8.0, 4, 2, 4, 2017),
+(1, 4, 3.1, 5, 2, 4, 2017),
+(2, 2, 8.0, 6, 3, 3, 2016),
+(2, 0, 8.0, 7, 3, 3, 2016),
+(2, 2, 5.0, 8, 3, 3, 2016),
+(2, 4, 6.0, 9, 3, 3, 2016),
+(2, 4, 7.0, 10, 3, 3, 2016),
+(2, 2, 7.2, 6, 1, 2, 2016),
+(2, 0, 6.1, 7, 1, 2, 2016),
+(2, 6, 5.9, 8, 1, 2, 2016),
+(2, 2, 7.8, 9, 1, 2, 2016),
+(2, 4, 6.3, 10, 1, 2, 2016),
+(1, 1, 2, NULL, 1, 1, 2018),
+(2, 0, 9, 12, 2, 3, 2016),
+(2, 0, 5, 13, 2, 3, 2018);
 --fim exercicio 2 --------------
--- DML -----------------------------------------------------------------------------------
+--================================================================================================= DML
 
---=================================================================================================
 
--- DQL -----------------------------------------------------------------------------------
+
+--================================================================================================= DQL
 --Data Query Language - Linguagem de Consulta de dados
 
 /*3. Encontre o nome e RA dos alunos com nota na disciplina de Banco de Dados no 2º semestre menor que 7.*/
@@ -215,7 +213,73 @@ INNER JOIN disciplinas D ON D.idDisciplina = H.idDisc_hist AND H.ano = 2017
 INNER JOIN professores P ON H.idProf_hist = P.idProfessor
 WHERE H.idDisc_hist = 4 AND P.idProfessor = 2
 
-SELECT * FROM professores
+/*10. Localize o nome e RA dos alunos do professor Sandro em 2016 ou 2017 que tiveram aulas com o professor Nava em outro período
+ de qualquer semestre ou ano. */
+SELECT A.idRA, A.nome AS 'ALUNO', P.nome AS PROFESSOR, H.ano
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON	H.idProf_hist = P.idProfessor
+WHERE (H.idProf_hist = 1 AND (H.ano = 2016 OR H.ano = 2017)) OR H.idProf_hist = 2
+ORDER BY H.ano
+
+/*11. Apresentar o histórico escolar do aluno CARLOS com informações do seu RA, nome, disciplinas, faltas, nota, ano e 
+semestre.*/
+SELECT A.*, P.nome AS 'PROFESSOR(a)',  D.disciplina AS 'DISCIPLINA', H.falta AS 'FALTAS', H.nota AS 'NOTA',
+H.ano AS 'ANO LETIVO', H.semestre AS 'SEMESTRE'
+FROM alunos A
+LEFT JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN disciplinas D ON D.idDisciplina = H.idDisc_hist
+INNER JOIN professores P ON P.idProfessor = H.idProf_hist
+WHERE H.idRA_hist = 7
+
+/*12. Encontre o nome dos alunos e professores que reside em Mogi Mirim. Essas informações devem ser apresentadas em apenas um 
+resultado. */
+SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
+FROM professores P
+INNER JOIN (cidades C INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno) ON P.idCidade_prof = C.idCidade
+WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
+--OU
+SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
+FROM professores P
+INNER JOIN cidades C ON P.idCidade_prof = C.idCidade
+INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno
+WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
+
+/*
+13. Forneça o nome dos alunos e nome das disciplinas com carga horária menor que 60 horas. Apresentar nesta consulta o nome dos
+respectivos professores responsáveis pelas disciplinas.
+*/
+--CONCATENANDO DISCIPLINA E PROFESSOR
+SELECT A.nome AS 'ALUNO', P.nome + ' - ' + D.disciplina AS 'PROFESSOR MINISTRA DISCP.', D.cargaHoraria
+FROM disciplinas D
+INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
+INNER JOIN alunos A ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+WHERE D.cargaHoraria < 60
+
+/*
+14. Localize o nome dos professores que lecionaram matérias nas quais o aluno “ANA APARECIDA” foi reprovado com nota inferior
+a < 5.
+*/
+SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', D.disciplina AS 'DISCIPLINA', H.nota AS 'NOTA'
+FROM historicos H
+INNER JOIN alunos A ON  H.idRA_hist = A.idRA
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE A.idRA = 5 AND H.nota < 5
+
+/*
+15. Apresente o RA e nome dos alunos dos alunos que frequentaram disciplinas lecionadas pelo prof. Sandro. 
+*/
+SELECT A.idRA AS 'RA', A.nome AS 'ALUNO', P.nome AS 'PROFESSOR'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+WHERE P.idProfessor = 1
+
+/*
+16. Encontre o Ra, nome e média das notas dos alunos que cursaram todas as matérias lecionadas por professores de Mogi Mirim. 
+*/
 
  /*30. Apresente o comando SQL necessário para apresentar a quantidade de alunos matriculado em cada disciplina. Outra coluna 
  deve apresentar o total de alunos cadastrados no total de disciplinas e uma terceira coluna deve calcular a porcentagem que cada
@@ -223,46 +287,24 @@ SELECT * FROM professores
 
  --#30.1 FORMA 1
 
+--================================================================================================= DQL
 
--- DQL -----------------------------------------------------------------------------------
+/*__________________________________________________________________________________________________________________________
 
---==============================================================================================================UTILITARIO
-SELECT *FROM alunos
-SELECT *FROM professores
-SELECT *FROM disciplinas
-SELECT *FROM historicos
-order by idDisc_hist
-SELECT *FROM estados
-
-SELECT COUNT(disciplina) disciplina
-FROM disciplinas
-
-SELECT COUNT(disciplina) AS 'DISCIPLINA'
-FROM disciplinas
-
-SELECT COUNT(d.disciplina) disciplina
-FROM disciplinas d
-
-sp_help [alunos]
+							------------------------------------------------------------------
+					  		|		       SOBRE ALGUNS PARÂMENTROS DE USO/ESTUDO			 |		
+							------------------------------------------------------------------
+____________________________________________________________________________________________________________________________*/
 
 
-SELECT cidades.nome, estados.uf
-	FROM cidades, estados
-	ORDER BY uf
-
-SELECT nome, c.idCidade FROM cidades c WHERE nome LIKE '%moji%'
-UPDATE cidades SET nome = 'Mogi Mirim' WHERE idCidade = 5053
-
---==============================================================================================================UTILITARIO
-
---==============================================================================================================STUDY
+--================================================================================================= JOIN BY STACKOVERFLOW
 ----------------------------------------------------------------------------------------------INNER
 /*
 INNER JOIN:
 Retorna dados apenas quando as duas tabelas tem chaves correspondentes na cláusula ON do JOIN.
 
 SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA INNER JOIN tabelaB ON tabelaA.chave = tabelaB.chave
+SELECT tabelaA.*, tabelaB.* FROM tabelaA INNER JOIN tabelaB ON tabelaA.pk = tabelaB.fk
 */
 --QUERY:
 SELECT alunos.*, historicos.*
@@ -285,7 +327,7 @@ Retorna a Tabela A inteira e apenas os registros que coincidirem com a igualdade
 campos sem correpondência).
 
 SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA LEFT JOIN tabelaB ON tabelaA.chave = tabelaB.chave
+SELECT tabelaA.*, tabelaB.* FROM tabelaA LEFT JOIN tabelaB ON tabelaA.pk = tabelaB.fk
 */
 --QUERY:
 SELECT alunos.*, historicos.*
@@ -305,7 +347,7 @@ Retorna a Tabela B inteira e apenas os registros que coincidirem com a igualdade
 campos sem correpondência).
 
 SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA RIGHT JOIN tabelaB ON tabelaA.chave = tabelaB.chave
+SELECT tabelaA.*, tabelaB.* FROM tabelaA RIGHT JOIN tabelaB ON tabelaA.pk = tabelaB.fk
 */
 --QUERY:
 SELECT alunos.*, historicos.* FROM alunos RIGHT JOIN historicos ON alunos.idRA = historicos.idRA_hist
@@ -315,9 +357,9 @@ SELECT alunos.*, historicos.* FROM alunos RIGHT JOIN historicos ON alunos.idRA =
 /*
 Conhecido como OUTER JOIN ou simplesmente FULL JOIN, este retorna todos os registros de amabas as tabelas
 SINTAXE:
-SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL OUTER JOIN TabelaB ON TabelaA.chave = TabelaB.chave
+SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL OUTER JOIN TabelaB ON TabelaA.pk = TabelaB.fk
 ou
-SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL JOIN TabelaB ON TabelaA.chave = TabelaB.chave
+SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL JOIN TabelaB ON TabelaA.pk = TabelaB.fk
 */
 --QUERY:
 SELECT alunos.*, historicos.* FROM alunos FULL OUTER JOIN historicos ON alunos.idRA = historicos.idRA_hist
@@ -343,5 +385,55 @@ SELECT alunos.*, historicos.* FROM alunos CROSS JOIN historicos
 SELECT alunos.*, historicos.* FROM alunos, historicos
 ----------------------------------------------------------------------------------------------CROSS
 --REFERÊNCIA: https://pt.stackoverflow.com/questions/6441/qual-%C3%A9-a-diferen%C3%A7a-entre-inner-join-e-outer-join
+--================================================================================================= JOIN BY STACKOVERFLOW
 
---==============================================================================================================STUDY
+
+--================================================================================================= JOIN COM MAIS DE 3 TABELAS
+--SINTAXE:
+/*
+SELECT TabelaA.*, TabelaB.*, TabelaC.*
+FROM TabelaB
+INNER JOIN (TabelaC INNER JOIN TabelaA ON TabelaC.pk = TabelaA.fk) ON TabelaB.fk = TabelaC.pk
+ou
+SELECT TabelaA.*, TabelaB.*, TabelaC.*
+FROM TabelaB
+INNER JOIN TabelaC ON TabelaB.fk = TabelaC.pk
+INNER JOIN TabelaA ON TabelaC.pk = TabelaA.fk
+*/
+--QUERY:
+--EX: 12
+SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
+FROM professores P
+INNER JOIN (cidades C INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno) ON P.idCidade_prof = C.idCidade
+WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
+--OU
+SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
+FROM professores P
+INNER JOIN cidades C ON P.idCidade_prof = C.idCidade
+INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno
+WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
+
+--================================================================================================= JOIN COM MAIS DE 3 TABELAS
+
+
+--================================================================================================= COUNT & DISTINC
+--EXEMPLOS
+
+--SELECIONA O NUMERO DE LINHAS, NO CASO DO EXEMPLO, NUMEROS DE LINHAS DA TABELA disciplinas REFERENTE A COLUMN cargaHoraria
+SELECT COUNT(disciplinas.cargaHoraria) AS 'NUM DE LINHAS' FROM disciplinas
+
+--LISTA O NÚMERO E CARAGA HORARIA DIFERENTES (DISTINTOS), NÃO REPETINDO OS DADOS
+SELECT DISTINCT(disciplinas.cargaHoraria) FROM disciplinas
+
+/*CONTA O NUMERO DE LINHAS NÃO REPETIDOS (DISTINTOS), NO CASO O NUMERO DE LINHAS DISTINTOS DA TABELA disciplinas REFERENTE A
+COLUMN cargaHoraria*/
+SELECT COUNT(DISTINCT disciplinas.cargaHoraria) AS 'APELIDO -> NUM DE LINHAS' FROM disciplinas
+--================================================================================================= COUNT & DISTINCT
+
+--================================================================================================= ISERIR DELETAR COLUNA
+--DELETAR COLUNA DE UMA TABELA
+--ALTER TABLE nomeTabela DROP COLUMN nomeColunaQueSeraDeletada
+
+--ADICIONAR UMA NOVA COLUNA  EM UMA TABELA EXISTENTE
+--ALTER TABLE nomeTabela ADD nomeNovaColunaQueSeraInserida TIPAGEM
+--================================================================================================= ISERIR DELETAR COLUNA
