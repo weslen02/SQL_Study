@@ -185,15 +185,15 @@ SELECT professores.nome AS 'NOME PROFESSOR', disciplinas.disciplina AS 'DISCIPLI
 	WHERE disciplina = 'Banco de Dados' AND ano = 2017
 
 /*7. Apresente a quantidade e nome das disciplinas que cada professor ministrou em de 2017.*/
-SELECT disciplinas.disciplina, historicos.ano, COUNT(disciplinas.disciplina) AS 'Qtnd/Ano Aula Ministrada'
+SELECT disciplinas.disciplina, historicos.ano, COUNT(disciplinas.idDisciplina) AS 'Qtnd/Ano Aula Ministrada'
 FROM disciplinas, historicos
 GROUP BY disciplina, ano
-HAVING ano = 2017
-
-SELECT d.disciplina, h.ano, COUNT(d.disciplina) AS 'Qtnd/Ano Aula Ministrada'
+HAVING ano = 2017 --NÃO UTILIZA-SE WHERE PARA GRUPOS DE LINHAS, USA-SE HAVING
+--OU
+SELECT d.disciplina, h.ano, COUNT(d.idDisciplina) AS 'Qtnd/Ano Aula Ministrada'
 FROM disciplinas d, historicos h
-GROUP BY disciplina, ano
-HAVING ano = 2017
+GROUP BY d.disciplina, h.ano
+HAVING h.ano = 2017 --NÃO UTILIZA-SE WHERE PARA GRUPOS DE LINHAS, USA-SE HAVING
 
 /*8. Encontre o nome, cidade dos alunos, código das disciplinas e nome da disciplina onde os alunos tiveram nota menor que 5 no
  1º semestre de 2018. */
@@ -203,7 +203,6 @@ INNER JOIN historicos h ON a.idRA = h.idRA_hist
 INNER JOIN disciplinas d ON  h.idDisc_hist = d.idDisciplina
 INNER JOIN cidades c ON a.idCidade_aluno = c.idCidade
 WHERE h.nota < 7 AND h.semestre = 1 AND h.ano = 2017
-GROUP BY a.nome, c.nome , d.idDisciplina, d.disciplina, h.nota
 
 /*9. Apresente o nome e RA dos alunos que frequentaram a disciplina de Estrutura de Dados com o professor Nava em 2017*/
 SELECT A.idRA, A.nome AS 'ALUNO', H.idDisc_hist, D.disciplina, P.nome, H.ano
@@ -280,7 +279,42 @@ WHERE P.idProfessor = 1
 /*
 16. Encontre o Ra, nome e média das notas dos alunos que cursaram todas as matérias lecionadas por professores de Mogi Mirim. 
 */
+SELECT A.idRA AS 'RA', A.nome AS 'ALUNO', AVG(H.nota) AS 'MEDIA DA NOTA', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE PROF'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+INNER JOIN cidades C ON P.idCidade_prof = C.idCidade
+WHERE P.idCidade_prof = 5053
+GROUP BY A.idRA, A.nome, P.nome, C.nome
 
+SELECT professores.nome, professores.idCidade_prof FROM professores
+
+/*
+17. Apresente uma consulta com o Ra, nome e média das notas por alunos.
+*/
+SELECT A.idRA, A.nome, AVG(H.nota) AS 'MEDIA DO ALUNO'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+GROUP BY A.idRA, A.nome
+ORDER BY A.nome
+
+/*18. Encontre o nome dos alunos que não foram reprovados em nenhuma matéria*/
+SELECT A.idRA, A.nome AS 'ALUNO'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+GROUP BY A.idRA, A.nome
+HAVING AVG (H.nota) > 6
+ORDER BY A.nome
+
+/*19. Forneça o número de alunos que fizeram Banco de dados e sitemas operacionais em 2017 no primeiro semestre*/
+
+SELECT COUNT(A.idRA) AS 'QUANTIDADE DE ALUNOS'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+--INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE H.idDisc_hist = 1 OR H.idDisc_hist = 2 AND H.ano = 2017 AND H.semestre = 1
+
+SELECT * FROM disciplinas
  /*30. Apresente o comando SQL necessário para apresentar a quantidade de alunos matriculado em cada disciplina. Outra coluna 
  deve apresentar o total de alunos cadastrados no total de disciplinas e uma terceira coluna deve calcular a porcentagem que cada
  disciplina representa do total de alunos matriculados. */
@@ -437,3 +471,41 @@ SELECT COUNT(DISTINCT disciplinas.cargaHoraria) AS 'APELIDO -> NUM DE LINHAS' FR
 --ADICIONAR UMA NOVA COLUNA  EM UMA TABELA EXISTENTE
 --ALTER TABLE nomeTabela ADD nomeNovaColunaQueSeraInserida TIPAGEM
 --================================================================================================= ISERIR DELETAR COLUNA
+
+--================================================================================================= GROUP BY
+/*A instrução GROUP BY é frequentemente usada com as funções agregadas (COUNT, MAX, MIN, SUM, AVG) para agrupar o conjunto
+de resultados em uma ou mais colunas.
+SINTAXE:
+SELECT column_nome(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s) 
+ORDER BY column_name(s);
+--REFERÊNCIA: w3schools
+--================================================================================================= GROUP BY
+
+--================================================================================================= GROUP BY + HAVING
+/*A instrução HAVING foi inclída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
+SUM, AVG)
+SINTAXE:
+SELECT column_nome(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+HAVING condition
+ORDER BY column_name(s);
+*/
+--REFERÊNCIA: w3schools
+
+*/
+
+/*
+Exempo:
+
+SINTAXE:
+SELECT TabelaA.colunaNome, AVG(TavelaB.colunaNome) AS 'PSEUDÔNIMO'
+FROM TabelaA
+INNER JOIN TabelaB ON Tabela.pk = TabelaB.fk
+GROUP BY TabelaA.colunaNome
+*/
+--================================================================================================= GROUP BY + HAVING
