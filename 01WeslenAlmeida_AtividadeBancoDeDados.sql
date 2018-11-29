@@ -6,8 +6,6 @@
 1. Criar o banco um novo banco de dados e elaborar as tabelas, definindo chave primária, chave secundária e
 relacionamentos. Para os campos chave primária de cada tabela definir como Identity (autonumeração).
 */
-
-
 --Cria o Banco
 CREATE DATABASE atividadeBancodeDados
 GO 
@@ -30,7 +28,7 @@ USE atividadeBancodeDados
 							--------------------ATENÇÃO------------------------
 
 PRIMEIRAMENTE EXECUTAR A CRIAÇÃO DA TABELA DE >>>>>>>>>>>>>>>> PAIS>ESTADO>CIDADE nesta ordem indicada,
-seguindo no arquivo >>02dbBrasilAtivadadeBancodeDados<<
+seguindo no arquivo >>02dbBrasilAtivadadeBancodeDados<< Normalização
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
@@ -90,7 +88,6 @@ CREATE TABLE historicos(
 
 
 
-
 --================================================================================================= DML
 --Data Manipulation Language - Linguagem de Manipulação de Dados
 
@@ -100,21 +97,21 @@ Rede de Computadores e Estrutura de dados, 3 professores e 15 históricos)*/
 
 --insere dados
 INSERT INTO alunos (nome, idCidade_aluno) VALUES
-('Joa da silva',	5053),
-('Maria da silva',	1),
-('Pedro Pereira',	2),
-('Amelia Reis',		25),
+('Joa da silva', 5053),
+('Maria da silva', 1),
+('Pedro Pereira', 2),
+('Amelia Reis', 25),
 ('Ana Aparecida',	101);
 
 INSERT INTO alunos (nome, idCidade_aluno) VALUES
-('Arthur Barbosa',	33),
-('Carlos filho',	66),
-('Fernando Moreira',99),
-('Julio Santos',	115),
-('Luana Batista',	199),
-('Alexandro C',		5053),
-('Jose Pedrosa',	999),
-('Jose Pedrosa',	999);
+('Arthur Barbosa', 33),
+('Carlos filho', 66),
+('Fernando Moreira', 99),
+('Julio Santos', 115),
+('Luana Batista', 199),
+('Alexandro C',	5053),
+('Jose Pedrosa', 999),
+('Jose Pedrosa', 999);
 
 INSERT INTO disciplinas (disciplina, cargaHoraria) VALUES
 ('Banco de Dados',100.00),
@@ -170,9 +167,10 @@ SELECT alunos.idRA AS 'RA', alunos.nome AS 'NOME ALUNO', historicos.nota AS 'NOT
  de histórico dos alunos. */
  ALTER TABLE historicos ADD ano INT
 
-/*5. Alterar a tabela de histórico definindo o ano para cada um dos registros de histórico da tabela. Para não registrar um an para cada registro, pode ser utilizado na clausula “where” o “in” e modificar o ano de vários registros ao mesmo tempo*/
-UPDATE historicos SET ano = 2017 WHERE semestre = 1
-UPDATE historicos SET ano = 2016 WHERE semestre = 2
+/*5. Alterar a tabela de histórico definindo o ano para cada um dos registros de histórico da tabela. Para não registrar um 
+ano para cada registro, pode ser utilizado na clausula “where” o “in” e modificar o ano de vários registros ao mesmo tempo*/
+UPDATE historicos SET ano = 2017 WHERE semestre = 1 --DML
+UPDATE historicos SET ano = 2016 WHERE semestre = 2 --DML
 
 /*6. Apresente o nome dos professores de Banco de dados que ministraram aulas em 2017.*/
 --Abreviação COM ALIAS???
@@ -287,8 +285,6 @@ INNER JOIN cidades C ON P.idCidade_prof = C.idCidade
 WHERE P.idCidade_prof = 5053
 GROUP BY A.idRA, A.nome, P.nome, C.nome
 
-SELECT professores.nome, professores.idCidade_prof FROM professores
-
 /*
 17. Apresente uma consulta com o Ra, nome e média das notas por alunos.
 */
@@ -307,19 +303,64 @@ HAVING AVG (H.nota) > 6
 ORDER BY A.nome
 
 /*19. Forneça o número de alunos que fizeram Banco de dados e sitemas operacionais em 2017 no primeiro semestre*/
-
 SELECT COUNT(A.idRA) AS 'QUANTIDADE DE ALUNOS'
 FROM alunos A
 INNER JOIN historicos H ON A.idRA = H.idRA_hist
 --INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
 WHERE H.idDisc_hist = 1 OR H.idDisc_hist = 2 AND H.ano = 2017 AND H.semestre = 1
 
-SELECT * FROM disciplinas
- /*30. Apresente o comando SQL necessário para apresentar a quantidade de alunos matriculado em cada disciplina. Outra coluna 
- deve apresentar o total de alunos cadastrados no total de disciplinas e uma terceira coluna deve calcular a porcentagem que cada
- disciplina representa do total de alunos matriculados. */
+/*20. Apresente a média de notas por disciplina. Ordenar o resultado por DISCIPLINA decrescente*/
+SELECT D.disciplina AS 'DISCIPLINA', AVG(H.nota) AS 'Media Nota'
+FROM disciplinas D
+INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
+GROUP BY D.disciplina
+ORDER BY D.disciplina DESC
 
- --#30.1 FORMA 1
+/*21. Apresentar o nome do aluno, cidade, código das disciplinas e nome da disciplina onde os alunos tiveram nota superior a 5 no
+1º semestre de 2017. Ordenar o resultado por nome da disciplina.*/
+SELECT A.nome AS 'NOME', C.nome AS 'CIDADE DO ALUNO', D.idDisciplina AS 'ID DISCP.', D.disciplina  AS 'DISCP.',
+H.semestre AS 'SEMESTRE', H.nota AS 'NOTA'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN cidades C ON A.idCidade_aluno = C.idCidade
+INNER JOIN disciplinas D ON D.idDisciplina = H.idDisc_hist
+WHERE H.nota > 5 AND H.semestre = 1
+ORDER BY D.disciplina
+
+/*22. Apresente o histórico escolar do aluno de nome Alex. A consulta deve apresentar seu RA, nome, a lista de disciplinas que 
+ele já cursou contendo o código e nome da disciplina, faltas, nota, ano e semestre. */
+SELECT A.idRA AS 'RA', A.nome AS 'ALUNO', H.*, D.*
+FROM alunos A
+LEFT JOIN historicos H ON A.idRA = H.idRA_hist
+LEFT JOIN disciplinas D ON D.idDisciplina = H.idDisc_hist
+WHERE A.nome LIKE '%ALEX%' --SQL SERVER NÃO TEM CamelCase, por isso a string pode ser upper ou lower case
+--COMO ALEX COTEM SOMENTE DADOS NULOS OUTRO EXEMPLO ABAIXO
+SELECT A.idRA AS 'RA', A.nome AS 'ALUNO', H.*, D.*
+FROM alunos A
+LEFT JOIN historicos H ON A.idRA = H.idRA_hist
+LEFT JOIN disciplinas D ON D.idDisciplina = H.idDisc_hist
+WHERE A.nome LIKE '%MA%'
+
+/*23. Apresente a quantidade que o aluno “José Pedrosa” cursou a disciplina de Banco de Dados.*/
+SELECT COUNT(D.disciplina) AS 'QNT VZS ALUNO CURSOU', A.nome AS 'NOME'
+FROM disciplinas D
+INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
+INNER JOIN alunos A ON A.idRA = H.idRA_hist
+WHERE A.nome LIKE '%JOSE%'
+GROUP BY A.nome
+
+/**/
+
+/*31. Considere a necessidade de normalizar o banco de dados. Observa-se que o campo “cidade” na tabela ALUNOS não atende às
+formas normais. Desta forma, apresentar quais comandos Sql devem ser apresentados na sequência com objetivo de: 
+
+N/A > NORMALIZADO NO INICIO DOS EXERCICIOS
+
+
+32. Considere a necessidade de normalizar o banco de dados idem à ocorrência do exercício anterior, porém, agora para o campo cidade da tabela professor. Observa-se que o campo “cidade” na tabela PROFESSOR não atende às formas normais. Desta forma, apresentar quais comandos Sql devem ser apresentados na sequência com objetivo de incluir uma chave secundário códigocidade na tabela professor e utilizar a tabela CIDADE (criada no exercício anterior) para vincular as informações. Seguir os itens abaixo e definir quais comandos são necessários para
+
+--N/A > NORMALIZADO NO INICIO DOS EXERCICIOS
+*/
 
 --================================================================================================= DQL
 
@@ -464,16 +505,19 @@ COLUMN cargaHoraria*/
 SELECT COUNT(DISTINCT disciplinas.cargaHoraria) AS 'APELIDO -> NUM DE LINHAS' FROM disciplinas
 --================================================================================================= COUNT & DISTINCT
 
---================================================================================================= ISERIR DELETAR COLUNA
---DELETAR COLUNA DE UMA TABELA
---ALTER TABLE nomeTabela DROP COLUMN nomeColunaQueSeraDeletada
+--================================================================================================= ISERIR E DELETAR COLUNA
+/*
+DELETAR COLUNA DE UMA TABELA
+ALTER TABLE nomeTabela DROP COLUMN nomeColunaQueSeraDeletada
 
---ADICIONAR UMA NOVA COLUNA  EM UMA TABELA EXISTENTE
---ALTER TABLE nomeTabela ADD nomeNovaColunaQueSeraInserida TIPAGEM
---================================================================================================= ISERIR DELETAR COLUNA
+ADICIONAR UMA NOVA COLUNA  EM UMA TABELA EXISTENTE
+ALTER TABLE nomeTabela ADD nomeNovaColunaQueSeraInserida TIPAGEM
+*/
+--================================================================================================= ISERIR E DELETAR COLUNA
 
 --================================================================================================= GROUP BY
-/*A instrução GROUP BY é frequentemente usada com as funções agregadas (COUNT, MAX, MIN, SUM, AVG) para agrupar o conjunto
+/*
+A instrução GROUP BY é frequentemente usada com as funções agregadas (COUNT, MAX, MIN, SUM, AVG) para agrupar o conjunto
 de resultados em uma ou mais colunas.
 SINTAXE:
 SELECT column_nome(s)
@@ -481,11 +525,14 @@ FROM table_name
 WHERE condition
 GROUP BY column_name(s) 
 ORDER BY column_name(s);
+
 --REFERÊNCIA: w3schools
+*/
 --================================================================================================= GROUP BY
 
 --================================================================================================= GROUP BY + HAVING
-/*A instrução HAVING foi inclída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
+/*
+A instrução HAVING foi inclída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
 SUM, AVG)
 SINTAXE:
 SELECT column_nome(s)
@@ -494,12 +541,7 @@ WHERE condition
 GROUP BY column_name(s)
 HAVING condition
 ORDER BY column_name(s);
-*/
---REFERÊNCIA: w3schools
 
-*/
-
-/*
 Exempo:
 
 SINTAXE:
@@ -507,5 +549,7 @@ SELECT TabelaA.colunaNome, AVG(TavelaB.colunaNome) AS 'PSEUDÔNIMO'
 FROM TabelaA
 INNER JOIN TabelaB ON Tabela.pk = TabelaB.fk
 GROUP BY TabelaA.colunaNome
+
+--REFERÊNCIA: w3schools
 */
 --================================================================================================= GROUP BY + HAVING
