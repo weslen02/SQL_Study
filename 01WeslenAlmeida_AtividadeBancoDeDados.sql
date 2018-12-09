@@ -12,28 +12,21 @@ GO
 
 /*SOBRE GO :
 É um número inteiro positivo. O lote que precede GO será executado pelo número de vezes especificado.
-Grante o fim do escopo, e a quantidade de vezes desejada que o escopo seja executado.*/
+Garante o fim do escopo, e a quantidade de vezes desejada que o escopo seja executado.
 
-/*SOBRE LOTE (batch):
+SOBRE LOTE (batch):
 Um lote de instruções SQL é um grupo de duas ou mais instruções SQL ou uma única instrução SQL
 que tem o mesmo efeito de um grupo de duas ou mais instruções SQL*/
 
---Troca do default que estamos MASTER passando para uso do banco criado aqui (atividadeBancodeDados)
+--Seleciona o banco a ser utilizado
 USE atividadeBancodeDados
 
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-											
-							--------------------ATENÇÃO------------------------
+/*						-------------------ATENÇÃO------------------------
 
-PRIMEIRAMENTE EXECUTAR A CRIAÇÃO DA TABELA DE >>>>>>>>>>>>>>>> PAIS>ESTADO>CIDADE nesta ordem indicada,
-seguindo no arquivo >>02dbBrasilAtivadadeBancodeDados<< Normalização
+PRIMEIRAMENTE EXECUTAR A CRIAÇÃO DA TABELA DE PAIS>ESTADO>CIDADE nesta ordem indicada para inciar com a -Normalização- já estabelicida. Tabela a ser criada contida no arquivo: 02dbBrasilAtivadadeBancodeDados */
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
---Cria tabela
+--Sitaxe para criar tabela
 CREATE TABLE alunos(
 	idRA			INT IDENTITY(10000,100) NOT NULL,
 	nome			VARCHAR(100),
@@ -42,9 +35,6 @@ CREATE TABLE alunos(
 	CONSTRAINT		pk_aluno PRIMARY KEY(idRA),
 	CONSTRAINT		fk_idCidade_aluno FOREIGN KEY(idCidade_aluno)
 							REFERENCES cidades	 (idCidade)
-
-				--tentando criar relação entre outro db, no caso aqui o db de Brasil com nomes de cidade e estados
-				--REFERENCES dbBrasil.dbo.cidades(idCidade)
 )
 
 CREATE TABLE professores(
@@ -86,16 +76,11 @@ CREATE TABLE historicos(
 ) 
 --================================================================================================= DDL
 
-
-
 --================================================================================================= DML
 --Data Manipulation Language - Linguagem de Manipulação de Dados
 
-
 /*2. Inserir informações em todas as tabelas (10 alunos, 4 disciplinas - Banco de dados, Sistemas Operacionais,
 Rede de Computadores e Estrutura de dados, 3 professores e 15 históricos)*/
-
---insere dados
 INSERT INTO alunos (nome, idCidade_aluno) VALUES
 ('Joa da silva', 5053),
 ('Maria da silva', 1),
@@ -125,7 +110,6 @@ INSERT INTO professores (nome, idCidade_prof) VALUES
 ('Rita',200);
 
 INSERT INTO historicos(semestre, falta, nota, idRA_hist, idProf_hist, idDisc_hist, ano) VALUES
---semestre 1
 (1, 2, 8.0, 1, 1, 1, 2017),
 (1, 4, 5.0, 2, 1, 1, 2017),
 (1, 2, 6.0, 3, 1, 1, 2017),
@@ -152,46 +136,44 @@ INSERT INTO historicos(semestre, falta, nota, idRA_hist, idProf_hist, idDisc_his
 --fim exercicio 2 --------------
 --================================================================================================= DML
 
-
-
 --================================================================================================= DQL
 --Data Query Language - Linguagem de Consulta de dados
 
-/*3. Encontre o nome e RA dos alunos com nota na disciplina de Banco de Dados no 2º semestre menor que 7.*/
-
-SELECT alunos.idRA AS 'RA', alunos.nome AS 'NOME ALUNO', historicos.nota AS 'NOTA', disciplinas.disciplina AS 'DISCIPLINA'
-	FROM alunos, disciplinas, historicos
-	WHERE disciplina = 'Banco de Dados' AND semestre = 2 AND nota < 7
+/*3. Encontre o nome e RA dos alunos com nota na disciplina de Banco de Dados no 1º semestre menor que 7.*/
+SELECT A.idRA AS 'RA', A.nome AS 'NOME ALUNO', H.nota AS 'NOTA', D.disciplina AS 'DISCIPLINA',
+H.semestre as 'SEMETESTRE'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE H.idDisc_hist = 1 AND H.semestre = 1 AND H.nota < 7
 
 /*4. Alterar a tabela histórico e incluir um campo inteiro chamado ano, com o objetivo de armazenar o ano e semestre do registro
  de histórico dos alunos. */
- ALTER TABLE historicos ADD ano INT
+ --ADICONAR COLUNA SINTAXE:
+ --ALTER TABLE tabela ADD colunaNova TIPO
+ALTER TABLE historicos ADD ano INT
 
 /*5. Alterar a tabela de histórico definindo o ano para cada um dos registros de histórico da tabela. Para não registrar um 
-ano para cada registro, pode ser utilizado na clausula “where” o “in” e modificar o ano de vários registros ao mesmo tempo*/
+ano para cada registro, pode ser utilizado na clausula “where” e modificar o ano de vários registros ao mesmo tempo*/
+--SINTAXE:
+--UPDATE tabela SET colunaRecebe = valor WHERE colunaCompara = valor
 UPDATE historicos SET ano = 2017 WHERE semestre = 1 --DML
 UPDATE historicos SET ano = 2016 WHERE semestre = 2 --DML
 
 /*6. Apresente o nome dos professores de Banco de dados que ministraram aulas em 2017.*/
---Abreviação COM ALIAS???
-SELECT p.nome, d.disciplina,  h.ano
-	FROM  professores p, historicos h, disciplinas d
-	WHERE d.disciplina = 'Banco de Dados' AND h.ano = 2017
-
-SELECT professores.nome AS 'NOME PROFESSOR', disciplinas.disciplina AS 'DISCIPLINA', historicos.ano
-	FROM professores, disciplinas, historicos
-	WHERE disciplina = 'Banco de Dados' AND ano = 2017
+--
+SELECT DISTINCT P.nome PROFESSOR, D.disciplina DISCIPLINA,   H.ano ANO
+FROM  professores P
+INNER JOIN historicos H ON P.idProfessor = H.idProf_hist
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE d.disciplina = 'Banco de Dados' AND h.ano = 2017
 
 /*7. Apresente a quantidade e nome das disciplinas que cada professor ministrou em de 2017.*/
-SELECT disciplinas.disciplina, historicos.ano, COUNT(disciplinas.idDisciplina) AS 'Qtnd/Ano Aula Ministrada'
-FROM disciplinas, historicos
-GROUP BY disciplina, ano
+SELECT D.disciplina, H.ano, COUNT(H.idDisc_hist) AS 'Qtnd/Ano Aula Ministrada'
+FROM disciplinas D
+INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
+GROUP BY D.disciplina, H.ano
 HAVING ano = 2017 --NÃO UTILIZA-SE WHERE PARA GRUPOS DE LINHAS, USA-SE HAVING
---OU
-SELECT d.disciplina, h.ano, COUNT(d.idDisciplina) AS 'Qtnd/Ano Aula Ministrada'
-FROM disciplinas d, historicos h
-GROUP BY d.disciplina, h.ano
-HAVING h.ano = 2017 --NÃO UTILIZA-SE WHERE PARA GRUPOS DE LINHAS, USA-SE HAVING
 
 /*8. Encontre o nome, cidade dos alunos, código das disciplinas e nome da disciplina onde os alunos tiveram nota menor que 5 no
  1º semestre de 2018. */
@@ -217,7 +199,7 @@ FROM alunos A
 INNER JOIN historicos H ON A.idRA = H.idRA_hist
 INNER JOIN professores P ON	H.idProf_hist = P.idProfessor
 WHERE (H.idProf_hist = 1 AND (H.ano = 2016 OR H.ano = 2017)) OR H.idProf_hist = 2
-ORDER BY H.ano
+ORDER BY P.idProfessor
 
 /*11. Apresentar o histórico escolar do aluno CARLOS com informações do seu RA, nome, disciplinas, faltas, nota, ano e 
 semestre.*/
@@ -363,193 +345,3 @@ N/A > NORMALIZADO NO INICIO DOS EXERCICIOS
 */
 
 --================================================================================================= DQL
-
-/*__________________________________________________________________________________________________________________________
-
-							------------------------------------------------------------------
-					  		|		       SOBRE ALGUNS PARÂMENTROS DE USO/ESTUDO			 |		
-							------------------------------------------------------------------
-____________________________________________________________________________________________________________________________*/
-
-
---================================================================================================= JOIN BY STACKOVERFLOW
-----------------------------------------------------------------------------------------------INNER
-/*
-INNER JOIN:
-Retorna dados apenas quando as duas tabelas tem chaves correspondentes na cláusula ON do JOIN.
-
-SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA INNER JOIN tabelaB ON tabelaA.pk = tabelaB.fk
-*/
---QUERY:
-SELECT alunos.*, historicos.*
-FROM alunos
-INNER JOIN historicos ON alunos.idRA = historicos.idRA_hist
---ou
-SELECT *
-FROM alunos
-INNER JOIN historicos ON alunos.idRA = historicos.idRA_hist
---ou
-SELECT *
-FROM alunos a
-INNER JOIN historicos h ON a.idRA = h.idRA_hist
-----------------------------------------------------------------------------------------------INNER
-
-----------------------------------------------------------------------------------------------LEFT
-/*
-LEFT JOIN:
-Retorna a Tabela A inteira e apenas os registros que coincidirem com a igualdade do JOIN na Tabela B (ou campos nulos para os
-campos sem correpondência).
-
-SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA LEFT JOIN tabelaB ON tabelaA.pk = tabelaB.fk
-*/
---QUERY:
-SELECT alunos.*, historicos.*
-FROM alunos
-LEFT JOIN historicos ON alunos.idRA = historicos.idRA_hist
---ou
-SELECT *
-FROM alunos
-LEFT JOIN historicos ON alunos.idRA = historicos.idRA_hist
-----------------------------------------------------------------------------------------------LEFT
-
-----------------------------------------------------------------------------------------------RIGHT
-/*
-RIGHT JOIN:
-Segue o mesmo racicínio do left join, mas se aplicando à tabela B em vez da A,
-Retorna a Tabela B inteira e apenas os registros que coincidirem com a igualdade do JOIN na Tabela A (ou campos nulos para os
-campos sem correpondência).
-
-SINTAXE:
-SELECT tabelaA.*, tabelaB.* FROM tabelaA RIGHT JOIN tabelaB ON tabelaA.pk = tabelaB.fk
-*/
---QUERY:
-SELECT alunos.*, historicos.* FROM alunos RIGHT JOIN historicos ON alunos.idRA = historicos.idRA_hist
-----------------------------------------------------------------------------------------------RIGHT
-
-----------------------------------------------------------------------------------------------FULL
-/*
-Conhecido como OUTER JOIN ou simplesmente FULL JOIN, este retorna todos os registros de amabas as tabelas
-SINTAXE:
-SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL OUTER JOIN TabelaB ON TabelaA.pk = TabelaB.fk
-ou
-SELECT TabelaA.*, TabelaB.* FROM TabelaA FULL JOIN TabelaB ON TabelaA.pk = TabelaB.fk
-*/
---QUERY:
-SELECT alunos.*, historicos.* FROM alunos FULL OUTER JOIN historicos ON alunos.idRA = historicos.idRA_hist
---ou
-SELECT alunos.*, historicos.* FROM alunos FULL JOIN historicos ON alunos.idRA = historicos.idRA_hist
-----------------------------------------------------------------------------------------------FULL
-
-----------------------------------------------------------------------------------------------CROSS
-/*
-Basicamente é o produto cartesiano entre as duas tabelas. Para cada linha de TabelaA, são retornadas todas as linhas da tabelaB.
-É mais fácil entender o Cross Join como um "Join sem cláusula ON", ou seja, todas as combinações de linhas de A e B são 
-devolvidads.
-
-Inclusive, se você fizer um CROSS JOIN com cláusula ON, ele "vira" um mero INNER JOIN.
-SINTAXE:
-SELECT TabelaA.*, TabelaB.* FROM TabelaA CROSS JOIN TabelaB
-ou
-SELECT TabelaA.*, TabelaB.* FROM TabelaA, TabelaB
-*/
---QUERY:
-SELECT alunos.*, historicos.* FROM alunos CROSS JOIN historicos
---ou
-SELECT alunos.*, historicos.* FROM alunos, historicos
-----------------------------------------------------------------------------------------------CROSS
---REFERÊNCIA: https://pt.stackoverflow.com/questions/6441/qual-%C3%A9-a-diferen%C3%A7a-entre-inner-join-e-outer-join
---================================================================================================= JOIN BY STACKOVERFLOW
-
-
---================================================================================================= JOIN COM MAIS DE 3 TABELAS
---SINTAXE:
-/*
-SELECT TabelaA.*, TabelaB.*, TabelaC.*
-FROM TabelaB
-INNER JOIN (TabelaC INNER JOIN TabelaA ON TabelaC.pk = TabelaA.fk) ON TabelaB.fk = TabelaC.pk
-ou
-SELECT TabelaA.*, TabelaB.*, TabelaC.*
-FROM TabelaB
-INNER JOIN TabelaC ON TabelaB.fk = TabelaC.pk
-INNER JOIN TabelaA ON TabelaC.pk = TabelaA.fk
-*/
---QUERY:
---EX: 12
-SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
-FROM professores P
-INNER JOIN (cidades C INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno) ON P.idCidade_prof = C.idCidade
-WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
---OU
-SELECT A.nome AS 'ALUNO', P.nome AS 'PROFESSOR', C.nome AS 'CIDADE'
-FROM professores P
-INNER JOIN cidades C ON P.idCidade_prof = C.idCidade
-INNER JOIN alunos A ON C.idCidade = A.idCidade_aluno
-WHERE A.idCidade_aluno = 5053 AND P.idCidade_prof = 5053
-
---================================================================================================= JOIN COM MAIS DE 3 TABELAS
-
-
---================================================================================================= COUNT & DISTINC
---EXEMPLOS
-
---SELECIONA O NUMERO DE LINHAS, NO CASO DO EXEMPLO, NUMEROS DE LINHAS DA TABELA disciplinas REFERENTE A COLUMN cargaHoraria
-SELECT COUNT(disciplinas.cargaHoraria) AS 'NUM DE LINHAS' FROM disciplinas
-
---LISTA O NÚMERO E CARAGA HORARIA DIFERENTES (DISTINTOS), NÃO REPETINDO OS DADOS
-SELECT DISTINCT(disciplinas.cargaHoraria) FROM disciplinas
-
-/*CONTA O NUMERO DE LINHAS NÃO REPETIDOS (DISTINTOS), NO CASO O NUMERO DE LINHAS DISTINTOS DA TABELA disciplinas REFERENTE A
-COLUMN cargaHoraria*/
-SELECT COUNT(DISTINCT disciplinas.cargaHoraria) AS 'APELIDO -> NUM DE LINHAS' FROM disciplinas
---================================================================================================= COUNT & DISTINCT
-
---================================================================================================= ISERIR E DELETAR COLUNA
-/*
-DELETAR COLUNA DE UMA TABELA
-ALTER TABLE nomeTabela DROP COLUMN nomeColunaQueSeraDeletada
-
-ADICIONAR UMA NOVA COLUNA  EM UMA TABELA EXISTENTE
-ALTER TABLE nomeTabela ADD nomeNovaColunaQueSeraInserida TIPAGEM
-*/
---================================================================================================= ISERIR E DELETAR COLUNA
-
---================================================================================================= GROUP BY
-/*
-A instrução GROUP BY é frequentemente usada com as funções agregadas (COUNT, MAX, MIN, SUM, AVG) para agrupar o conjunto
-de resultados em uma ou mais colunas.
-SINTAXE:
-SELECT column_nome(s)
-FROM table_name
-WHERE condition
-GROUP BY column_name(s) 
-ORDER BY column_name(s);
-
---REFERÊNCIA: w3schools
-*/
---================================================================================================= GROUP BY
-
---================================================================================================= GROUP BY + HAVING
-/*
-A instrução HAVING foi inclída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
-SUM, AVG)
-SINTAXE:
-SELECT column_nome(s)
-FROM table_name
-WHERE condition
-GROUP BY column_name(s)
-HAVING condition
-ORDER BY column_name(s);
-
-Exempo:
-
-SINTAXE:
-SELECT TabelaA.colunaNome, AVG(TavelaB.colunaNome) AS 'PSEUDÔNIMO'
-FROM TabelaA
-INNER JOIN TabelaB ON Tabela.pk = TabelaB.fk
-GROUP BY TabelaA.colunaNome
-
---REFERÊNCIA: w3schools
-*/
---================================================================================================= GROUP BY + HAVING
