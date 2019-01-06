@@ -449,19 +449,4 @@ SELECT H.nota
 FROM historicos H
 WHERE H.nota < 6 OR H.nota IS NULL
 ORDER BY nota
-
-/*30. Apresente o comando SQL necessário para apresentar a quantidade de alunos matriculado em cada disciplina. Outra coluna deve
- apresentar o total de alunos cadastrados no total de disciplinas e uma terceira coluna deve calcular a porcentagem que cada 
- disciplina representa do total de alunos matriculados.*/
-SELECT Total.qntd_alunos_disc, SUM(Total.qntd_alunos_disc) AS TOTAL
-FROM (
-	SELECT D.idDisciplina, D.disciplina,  COUNT(H.idRA_hist) AS qntd_alunos_disc
-	FROM disciplinas D
-	INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
-	GROUP BY D.idDisciplina,  D.disciplina
-	) AS Total
-GROUP BY Total.qntd_alunos_disc
-
-SELECT * FROM historicos
-WHERE historicos.idDisc_hist = 3
 --================================================================================================= DQL
