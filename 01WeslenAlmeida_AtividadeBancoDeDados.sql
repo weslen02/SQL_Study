@@ -331,17 +331,137 @@ INNER JOIN alunos A ON A.idRA = H.idRA_hist
 WHERE A.nome LIKE '%JOSE%'
 GROUP BY A.nome
 
-/**/
+/*24. Apresentar a quantidade de alunos cursaram a disciplina de Banco de Dados em 2016 e 2017.*/
+SELECT COUNT(H.idRA_hist) AS 'QNTD ALUNOS'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+WHERE (H.idDisc_hist = 1 AND (ANO = 2016 OR ANO = 2017))
 
-/*31. Considere a necessidade de normalizar o banco de dados. Observa-se que o campo “cidade” na tabela ALUNOS não atende às
-formas normais. Desta forma, apresentar quais comandos Sql devem ser apresentados na sequência com objetivo de: 
+/*25. Insira todos os alunos da disciplina de BD (Banco de Dados) em 2017 e que tiveram nota > 5, cursando a disciplina TBD
+(Tópicos em Banco de Dados) em 2015 com o mesmo professor, mas com frequência e nota desconhecidas (nulo).*/
 
-N/A > NORMALIZADO NO INICIO DOS EXERCICIOS
+SELECT * FROM historicos
 
+--------------
+--INSERINDO DADO, PS: Nome escrito errado atualizar no proximo comando
+INSERT INTO disciplinas VALUES ('TOPICOS BANCO DE DADOS', 125)
 
-32. Considere a necessidade de normalizar o banco de dados idem à ocorrência do exercício anterior, porém, agora para o campo cidade da tabela professor. Observa-se que o campo “cidade” na tabela PROFESSOR não atende às formas normais. Desta forma, apresentar quais comandos Sql devem ser apresentados na sequência com objetivo de incluir uma chave secundário códigocidade na tabela professor e utilizar a tabela CIDADE (criada no exercício anterior) para vincular as informações. Seguir os itens abaixo e definir quais comandos são necessários para
+--Atulalizar nome topico banco de dados para topicos em banco de dados
+UPDATE disciplinas SET disciplina = 'TOPICOS EM BANCO DE DADOS' WHERE idDisciplina = 5
 
---N/A > NORMALIZADO NO INICIO DOS EXERCICIOS
-*/
+SELECT disciplinas.* FROM disciplinas
+--------------
 
+SELECT *
+FROM historicos H
+WHERE H.idDisc_hist = 1 AND nota > 5
+
+INSERT INTO historicos VALUES
+( 1, NULL, NULL, 1, 1, 5, 2015 ),
+( 1, NULL, NULL, 3, 1, 5, 2015 ),
+( 1, NULL, NULL, 4, 1, 5, 2015 )
+
+SELECT H.*
+FROM historicos H
+WHERE H.idDisc_hist = 1 OR H.idDisc_hist = 5
+
+SELECT A.*, H.*, D.*
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE H.idDisc_hist = 1 OR H.idDisc_hist = 5
+
+/*26. Altere as notas dos alunos de Banco de Dados (BD) em 2012 com o professor Sandro através da seguinte regra:
+A- notas entre [4.0 e 5.0] devem ser alteradas para 4.0.
+B - notas entre [5.0 e 9.0] terão acréscimo de 0.5 e
+C - Notas acima de 9.5, inclusive ficarão com 10.0. */
+
+--PS: select com case precisa de virgula, update não!
+SELECT A.idRA, A.nome, H.nota, P.idProfessor, P.idProfessor,
+CASE
+	WHEN ( H.nota = 4 AND H.nota < 5 ) THEN '4'
+	WHEN ( H.nota > 4.9 AND H.nota <= 9 ) THEN nota + 0.5
+	WHEN ( H.nota > 9.5 ) THEN '10'
+	ELSE nota
+END AS 'UPDATE NOTA'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE ( H.idDisc_hist = 1 AND H.ano = 2017 AND H.idProf_hist = 1 )
+
+--PS: update NÃO faz uso do END AS 'DESCRICAO'
+UPDATE historicos
+SET nota =
+CASE
+	WHEN ( H.nota = 4 AND H.nota < 5 ) THEN 4
+	WHEN ( H.nota > 4.9 AND H.nota <= 9 ) THEN nota + 0.5
+	WHEN ( H.nota >= 9.5 ) THEN 10
+	ELSE nota
+END 
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE ( H.idDisc_hist = 1 AND H.ano = 2017 AND H.idProf_hist = 1 )
+
+SELECT A.idRA, A.nome, H.nota, P.idProfessor, P.idProfessor
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN professores P ON H.idProf_hist = P.idProfessor
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+WHERE ( H.idDisc_hist = 1 AND H.ano = 2017 AND H.idProf_hist = 1 )
+
+/*27. Apresente uma consulta com o nome do aluno, nome da disciplina, faltas, notas e uma informação de “reprovado” ou aprovado 
+com base na sua nota. Nota superior ou igual a 7,0 deve considerar o resultado de “aprovado” e caso contrário “reprovado”.*/
+
+SELECT A.nome, D.disciplina, H.falta, H.nota,
+CASE
+	WHEN ( H.nota >= 7 ) THEN 'APROVADO'
+	WHEN ( H.nota < 7 ) THEN 'REPROVADO'
+	ELSE 'N/A'
+END AS 'STATUS'
+FROM alunos A
+INNER JOIN historicos H ON A.idRA = H.idRA_hist
+INNER JOIN disciplinas D ON H.idDisc_hist = D.idDisciplina
+
+/*28. Apresente como resultado a média das notas dos alunos por disciplina somente dos alunos que foram reprovados, ou seja, 
+apresentem média inferior a 7.0.*/
+SELECT D.disciplina, AVG( H.nota ) AS 'MEDIA DE NOTA', 
+CASE
+	WHEN AVG(H.nota) < 7 THEN 'Baixo'
+END AS 'INDICE PROGR. CURSO'
+FROM disciplinas D
+INNER JOIN historicos H ON D.idDisciplina = H.idRA_hist
+GROUP BY D.disciplina
+HAVING AVG( H.nota ) < 7
+
+/*29. Apresente o comando SQL necessário para acrescentar 0,5 pontos a todas as notas < 5.5 da disciplina de banco de dados 
+cadastrado no banco, independente do aluno.*/
+SELECT H.nota
+FROM historicos H
+WHERE H.nota < 5.5 AND H.nota IS NOT NULL
+ORDER BY nota
+
+UPDATE historicos SET nota = nota + 0.5 WHERE nota < 5.5 AND nota IS NOT NULL
+
+SELECT H.nota
+FROM historicos H
+WHERE H.nota < 6 OR H.nota IS NULL
+ORDER BY nota
+
+/*30. Apresente o comando SQL necessário para apresentar a quantidade de alunos matriculado em cada disciplina. Outra coluna deve
+ apresentar o total de alunos cadastrados no total de disciplinas e uma terceira coluna deve calcular a porcentagem que cada 
+ disciplina representa do total de alunos matriculados.*/
+SELECT Total.qntd_alunos_disc, SUM(Total.qntd_alunos_disc) AS TOTAL
+FROM (
+	SELECT D.idDisciplina, D.disciplina,  COUNT(H.idRA_hist) AS qntd_alunos_disc
+	FROM disciplinas D
+	INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
+	GROUP BY D.idDisciplina,  D.disciplina
+	) AS Total
+GROUP BY Total.qntd_alunos_disc
+
+SELECT * FROM historicos
+WHERE historicos.idDisc_hist = 3
 --================================================================================================= DQL

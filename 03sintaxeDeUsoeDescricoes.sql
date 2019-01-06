@@ -165,7 +165,7 @@ ORDER BY column_name(s);
 
 --================================================================================================= GROUP BY + HAVING
 /*
-A instrução HAVING foi inclída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
+A instrução HAVING foi incluída no SQL porque a palavra-chave WHERE não pode ser usa com as funções agregadas (COUNT, MAX, MIN,
 SUM, AVG)
 SINTAXE:
 SELECT column_nome(s)
@@ -203,3 +203,34 @@ INNER JOIN historicos H ON D.idDisciplina = H.idDisc_hist
 INNER JOIN alunos A ON A.idRA = H.idRA_hist
 INNER JOIN professores P ON H.idProf_hist = P.idProfessor
 WHERE D.cargaHoraria < 60
+
+/*
+INFO:
+ALTER TABLE, Responsável pelas alterações na estrutura dos dados.
+UPADATE, Responsável pelas atualizações no próprio dado, altera o dado espcífico
+*/
+
+
+/*
+CASE:
+-- Syntax for SQL Server and Azure SQL Database  
+
+Simple CASE expression:   
+CASE input_expression   
+     WHEN when_expression THEN result_expression [ ...n ]   
+     [ ELSE else_result_expression ]   
+END   
+Searched CASE expression:  
+CASE  
+     WHEN Boolean_expression THEN result_expression [ ...n ]   
+     [ ELSE else_result_expression ]   
+END
+*/
+
+/*
+UPDATE Syntax:
+
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+*/
