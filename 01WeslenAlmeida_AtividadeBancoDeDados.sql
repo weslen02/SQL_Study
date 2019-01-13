@@ -34,7 +34,7 @@ CREATE TABLE alunos(
 	idCidade_aluno	INT,
 	CONSTRAINT		pk_aluno PRIMARY KEY(idRA),
 	CONSTRAINT		fk_idCidade_aluno FOREIGN KEY(idCidade_aluno)
-							REFERENCES cidades	 (idCidade)
+					REFERENCES cidades(idCidade)
 )
 
 CREATE TABLE professores(
@@ -44,7 +44,7 @@ CREATE TABLE professores(
 	idCidade_prof	INT,
 	CONSTRAINT		pk_professor PRIMARY KEY(idProfessor),
 	CONSTRAINT		fk_idCidade_prof FOREIGN KEY(idCidade_prof)
-						REFERENCES cidades		(idCidade)
+					REFERENCES cidades(idCidade)
 )
 
 CREATE TABLE disciplinas(
@@ -67,12 +67,15 @@ CREATE TABLE historicos(
 	idProf_hist		INT,
 	idDisc_hist		INT,
 	CONSTRAINT		pk_idHistorico PRIMARY KEY(idHistorico),
+
 	CONSTRAINT		fk_idRA_hist FOREIGN KEY(idRA_hist)
-						REFERENCES alunos	(idRA),
+					REFERENCES alunos(idRA),
+
 	CONSTRAINT		fk_idProf_hist FOREIGN KEY (idProf_hist)
-						REFERENCES professores (idProfessor),
+					REFERENCES professores(idProfessor),
+
 	CONSTRAINT		fk_idDisc_hist FOREIGN KEY (idDisc_hist)
-						REFERENCES disciplinas (idDisciplina)
+					REFERENCES disciplinas(idDisciplina)
 ) 
 --================================================================================================= DDL
 
@@ -135,7 +138,7 @@ INSERT INTO historicos(semestre, falta, nota, idRA_hist, idProf_hist, idDisc_his
 (2, 0, 5, 13, 2, 3, 2018);
 --fim exercicio 2 --------------
 --================================================================================================= DML
-
+select * from alunos
 --================================================================================================= DQL
 --Data Query Language - Linguagem de Consulta de dados
 

@@ -180,7 +180,7 @@ Exempo:
 SINTAXE:
 SELECT TabelaA.colunaNome, AVG(TavelaB.colunaNome) AS 'PSEUDÔNIMO'
 FROM TabelaA
-INNER JOIN TabelaB ON Tabela.pk = TabelaB.fk
+INNER JOIN TabelaB ON TabelaA.pk = TabelaB.fk
 GROUP BY TabelaA.colunaNome
 
 --REFERÊNCIA: w3schools
@@ -234,3 +234,50 @@ UPDATE table_name
 SET column1 = value1, column2 = value2, ...
 WHERE condition;
 */
+
+
+
+
+/*###################################################################### NORMALIZAÇAO
+Legenda:
+tableA		> Tabela que contém a coluna a ser Normalizada;
+tableBName	> Nome que a tabela receberá ao ser criada no primeiro STEP, após o 1º Step chamaremos apenas de tableB;
+tableB		> Coluna transformada em tabela carregando os dados, que está sendo ou é normalizada;
+columnN		> Coluna com os dados a ser normalizada;
+PKtableB	> Nome que a chave primaria irá ter na tabela Normalizada;
+pk_tableB	> Apelido que a PK recebe ao ser criada, se não criado é referenciada por Alfanumérico;
+FKtableB	> Nome que a FK da tableB recebe na tableA. (Nome independe do funcionamento, meu padrão para FK é:
+idNomeDaTabelaQueVem_NomeDaTabelaQueEsta);
+fk_tableB_tableA > Apelido para FK como o Apelido de PK, segue os mesmo padrão anterior para mim.
+
+---------------------------SINTAXE NORMALIZAÇÃO-----------------------------
+SETEP 1:
+SELECT DISTINCT tableA.columnN INTO tabelaBName
+FROM tableA
+
+STEP 2: (OPCIONAL) Apenas para verificar se a tabela foi criada
+SELECT tableB.*
+FROM tableB
+
+
+STEP 3:
+ALTER TABLE tableB ADD
+PKtableB				INT IDENTITY(1,1) NOT NULL,
+CONSTRAINT				pk_tableB PRIMARY KEY(PKtableB)
+
+STEP 4:
+ALTER TABLE tableA ADD
+FKtableB				INT,
+CONSTRAINT				fk_tableB_tableA FOREIGN KEY(FKtableB)
+						REFERENCES tableB(PKtableB)
+
+STEP 5:
+UPDATE tableA SET tableA.FKtableB =
+	(SELECT tableB.PKtableB FROM tableB
+	 WHERE tableB.columnN = tableA.columnN)
+
+
+STEP 6:
+ALTER TABLE tableA DROP COLUMN columnN
+---------------------------SINTAXE NORMALIZAÇÃO-----------------------------
+####################################################################### NORMALIZAÇAO */
